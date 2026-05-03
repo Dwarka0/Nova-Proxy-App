@@ -1,7 +1,7 @@
 name: Build NovaProxy EXE
 
 on:
-  workflow_dispatch:   # این خط باعث می‌شود بتوانید دستی اجرایش کنید
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,7 +13,15 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.5'   # نسخه‌ای که پروژه نیاز دارد
+          go-version: '1.25.5'
+
+      - name: Remove problematic replace directives
+        shell: pwsh
+        run: |
+          (Get-Content go.mod) | Where-Object { 
+            $_ -notmatch 'replace github.com/wailsapp/wails/v3' -and 
+            $_ -notmatch 'replace github.com/refraction-networking/utls' 
+          } | Set-Content go.mod
 
       - name: Build
         shell: cmd
